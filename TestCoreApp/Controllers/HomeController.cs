@@ -20,6 +20,7 @@ namespace TestCoreApp.Controllers
 
         public IActionResult Index()
         {
+            Trace.TraceInformation("Wencome to testcoreapp !!!!");
             return View();
         }
 
