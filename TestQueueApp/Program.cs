@@ -1,4 +1,6 @@
-﻿using Microsoft.ServiceBus.Messaging;
+﻿using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.ServiceBus.Messaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,21 +18,33 @@ namespace TestQueueApp
         }
         static QueueConnection conn = new QueueConnection();
 
-        static void Main(string[] args)
+        static  void Main(string[] args)
         {
-            //for (var i = 0; i < 50; i++)
-            //{
-            //    var message = GetBrokeredMeaagse($"This is a test message {i+1}");
-            //    message.Properties.Add("MessageId", Guid.NewGuid().ToString());
-            //    message.Properties.Add("MessageType", "WOSegmentCreatedInDbs");
-            //    conn.SendMessage(message);
-            //}
-
-            Console.WriteLine($"No Of Messgaes: {conn.CountMessages()}");
-
-            Console.ReadLine();
+                              Console.WriteLine(new DbConnection().GetEmployyeeCount());
+                              Console.ReadLine();
 
         }
+
+          static async void GetSecret()
+                    {
+                              AzureServiceTokenProvider azureServiceTokenProvider = new AzureServiceTokenProvider();
+
+                              try
+                              {
+                                        var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+
+                                        var secret = await keyVaultClient.GetSecretAsync("https://testnss.vault.azure.net/secrets/password").ConfigureAwait(false);
+
+                                        Console.WriteLine($"Secret: {secret.Value}");
+
+                                        Console.WriteLine(azureServiceTokenProvider.PrincipalUsed.Type);
+
+                              }
+                              catch (Exception exp)
+                              {
+                                        Console.WriteLine($"Something went wrong: {exp}");
+                              }
+                    }
 
         static void Receive()
         {
